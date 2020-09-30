@@ -9,7 +9,7 @@ function s2huffman()
 		var s = s.split('').map(x=>x.charCodeAt(0).toString(16));
 		s.map(x=>t[x]=(t[x]?t[x]+1:1));
 		for(var i in t){ o.push([t[i], i]); t[i]=''; };
-		while(o.length&&(o = o.sort(function(a,b){ return b[0]-a[0]; })))
+		while(o.length&&(o = o.sort(function(a,b){ return (a[0]==b[0]?a[1]<b[1]:b[0]>a[0]); })))
 			if((result = o.pop())&&(_r = o.pop()))o.push([result[0]+_r[0], result.slice(1), _r.slice(1)]);
 		result = result.slice(1); this.clean(result, t, '');
 		var len = (s = s.map(x=>t[x]).join('')).length;
