@@ -7,8 +7,8 @@ function s2huffman()
 		if(s.length<2)return null; 		
 		var [ts, o, t, r, r1] = [{}, [], [], '', 0];
 		(s=s.split('').map(x=>x.charCodeAt(0).toString(16).padStart(2, '0'))).map(x=>(undefined==ts[x]?ts[x]=[1,x]:ts[x][0]+=1));
-		ts = Object.values(ts);//.sort(function(a, b){ return parseInt(a[1], 16)-parseInt(b[1], 16); });
-		do{ ts = ts.sort(function(a, b){ return b[0]-a[0]; }); result = ts.pop(); if(r1 = ts.pop())ts.push([result[0]+r1[0], result.slice(1), r1.slice(1)]); }while(r1); 
+		ts = Object.values(ts); do{ ts = ts.sort(function(a, b){ return b[0]-a[0]; }); result = ts.pop(); 
+		if(r1 = ts.pop())ts.push([result[0]+r1[0], result.slice(1), r1.slice(1)]); }while(r1); 
 		this.clean((result = result.slice(1)), t, ''); while(s.length)r+=t[s.pop()]; if(!(r1=r.length))return null;
 		while(en = r.slice(-8)){ o.push(parseInt(en, 2).toString(16).padStart(2, '0')); r = r.slice(0, -8); }; result = JSON.stringify(result);
 		for(var i in (p={'\x22':'', ',':'M', '\\\[\\\[':'L', '\\\]\\\]':'K', '\\\(\\\(':'J', '\\\)\\\)':'I', '\\\(\\\[':'H', '\\\)\\\]':'G'}))result = result.replace(new RegExp(i, 'g'), p[i]);
