@@ -5,28 +5,26 @@ function s2huffman()
 	this.compress = function(s)
 	{
 		if(s.length<2)return null; 		
-		var r = [], o = [], t = {}, h='', result = null;
-		var s = s.split('').map(x=>x.charCodeAt(0).toString(16));
-		s.map(x=>t[x]=(t[x]?t[x]+1:1));
-		for(var i in t){ o.push([t[i], i]); t[i]=''; };
-		while(o.length&&(o = o.sort(function(a,b){ return (a[0]==b[0]?a[1]<b[1]:b[0]>a[0]); })))
-			if((result = o.pop())&&(_r = o.pop()))o.push([result[0]+_r[0], result.slice(1), _r.slice(1)]);
-		result = result.slice(1); this.clean(result, t, '');
-		var len = (s = s.map(x=>t[x]).join('')).length;
-		while(node = s.substr(-8)){ h = parseInt(node, 2).toString(16).padStart(2, '0').toUpperCase()+h; s = s.substr(0, s.length-8); };
-		r = JSON.stringify(result); for(var i in (p={'\x22':'', ',':'M', '\\\[\\\[':'L', '\\\]\\\]':'K', '\\\(\\\(':'J', '\\\)\\\)':'I', '\\\(\\\[':'H', '\\\)\\\]':'G'}))r = r.replace(new RegExp(i, 'g'), p[i]);
-		return 's2'+r+'.'+len.toString(16).padStart(4, '0')+(h.toUpperCase());
+		var [ts, o, t, r, r1] = [{}, [], [], '', 0];
+		(s=s.split('').map(x=>x.charCodeAt(0).toString(16).padStart(2, '0'))).map(x=>(undefined==ts[x]?ts[x]=[1,x]:ts[x][0]+=1));
+		ts = Object.values(ts);//.sort(function(a, b){ return parseInt(a[1], 16)-parseInt(b[1], 16); });
+		do{ ts = ts.sort(function(a, b){ return b[0]-a[0]; }); result = ts.pop(); if(r1 = ts.pop())ts.push([result[0]+r1[0], result.slice(1), r1.slice(1)]); }while(r1); 
+		this.clean((result = result.slice(1)), t, ''); while(s.length)r+=t[s.pop()]; if(!(r1=r.length))return null;
+		while(en = r.slice(-8)){ o.push(parseInt(en, 2).toString(16).padStart(2, '0')); r = r.slice(0, -8); }; result = JSON.stringify(result);
+		for(var i in (p={'\x22':'', ',':'M', '\\\[\\\[':'L', '\\\]\\\]':'K', '\\\(\\\(':'J', '\\\)\\\)':'I', '\\\(\\\[':'H', '\\\)\\\]':'G'}))result = result.replace(new RegExp(i, 'g'), p[i]);
+		return 's2'+result+'.'+r1.toString(16).padStart(4, '0')+o.join('');
 	};
 	this.decompress = function(s)
 	{
 		if('s2'!=s.substr(0, 2))return null; var result = '';
-		if((e = s.substr(2).split('.')).length==2)
+		if((e = s.split('.')).length==2)
 		{
+			e[0] = e[0].substr(2);
 			for(var i in (p={'G':')]', 'H':'([', 'I':'))', 'J':'((', 'K':']]', 'L':'[[', 'M':'","', '\\\]':'"]', '\\\]\\\x22':']', '\\\[':'["', '\\\x22\\\[':'['}))e[0] = e[0].replace(new RegExp(i, 'g'), p[i]);
 			if(e[0]=JSON.parse(e[0]))
-			{				
-				lu = (lu = e[1].substr(4).match(/.{1,2}/g).map(x=>parseInt(x, 16).toString(2).padStart(8, '0')).join('')).substr(lu.length-parseInt(e[1].substr(0, 4), 16));
-				var ptr = e[0]; for(var i = 0; i<lu.length; i++)if('string'==typeof ptr[lu[i]]){ result+=String.fromCharCode(parseInt(ptr[lu[i]], 16)); ptr = e[0]; } else ptr = ptr[lu[i]];
+			{			
+				var lu = (lu = e[1].substr(4).match(/.{1,2}/g).map(x=>parseInt(x, 16).toString(2).padStart(8, '0')).reverse().join('')).substr(-parseInt(e[1].substr(0, 4), 16));
+				var ptr = e[0]; for(var i = 0; i<lu.length; i++)if('string'==typeof ptr[lu[i]]){ result=String.fromCharCode(parseInt(ptr[lu[i]], 16))+result; ptr = e[0]; } else ptr = ptr[lu[i]];
 			};
 		};
 		return result;
