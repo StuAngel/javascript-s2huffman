@@ -23,7 +23,7 @@ function s2huffman()
 			for(var i in (p={'G':')]', 'H':'([', 'I':'))', 'J':'((', 'K':']]', 'L':'[[', 'M':'","', '\\\]':'"]', '\\\]\\\x22':']', '\\\[':'["', '\\\x22\\\[':'['}))e[0] = e[0].replace(new RegExp(i, 'g'), p[i]);
 			if(e[0]=JSON.parse(e[0]))
 			{			
-				var lu = (lu = e[1].substr(4).match(/.{1,2}/g).map(x=>parseInt(x, 16).toString(2).padStart(8, '0')).reverse().join('')).substr(-parseInt(e[1].substr(0, 4), 16));
+				var lu = (lu = e[1].substr(4).match(/.{1,2}/g).map(x=>parseInt(x, 16).toString(2).padStart(8, '0')).reverse().join('')).padStart((l=parseInt(e[1].substr(0, 4), 16)), '0').substr(-l);
 				var ptr = e[0]; for(var i = 0; i<lu.length; i++)if('string'==typeof ptr[lu[i]]){ result=String.fromCharCode(parseInt(ptr[lu[i]], 16))+result; ptr = e[0]; } else ptr = ptr[lu[i]];
 			};
 		};
